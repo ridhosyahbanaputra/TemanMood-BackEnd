@@ -1,4 +1,4 @@
-# Teman Mood — Backend API
+# Teman Mood — Backend API Documentation
 
 Backend API untuk aplikasi TemanMood menggunakan Node.js, Express, dan Supabase.
 
