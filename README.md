@@ -33,7 +33,9 @@ Buat file `.env` di root project:
 PORT=your_port
 SUPABASE_URL=your_supabase_url
 SUPABASE_KEY=your_supabase_key
-JWT_SECRET=your_secret_key
+
+ACCESS_TOKEN_KEY=your_secret_key
+REFRESH_TOKEN_KEY=your_secret_key
 ```
 ---
 
@@ -43,8 +45,8 @@ npm run dev
 ```
 ---
 
-## Enpoint
-### Authentications
+# Enpoint
+### Login
 ---
 Endpoint
 ```
@@ -55,7 +57,7 @@ Request
 Request Body:
 {
   "email": "user@gmail.com",
-  "password": " "
+  "password": "123456"
 }
 ```
 Response
@@ -63,13 +65,60 @@ Response
 Response:
 {
   "message": "success",
-  "token": "jwt_token_here"
+  "data": {
+      "accessToken": " ",
+      "refreshToken": " ",
+      "user": {
+          "username": " "
+        }
+    }
 }
 ```
-
-### Create User
 ---
-Endpoint
+#### Refresh Token
+```
+PUT /authentications
+```
+Request
+```
+Request Body:
+{
+  "refreshToken": " "
+}
+```
+Response
+```
+Response:
+{
+    "status": "success",
+    "data": {
+        "accessToken": " "
+    }
+}
+```
+---
+#### Logout
+```
+DELETE /authentications
+```
+Request
+```
+Request Body:
+{
+  "refreshToken": " "
+}
+```
+Response
+```
+Response:
+{
+    "status": "success",
+}
+```
+---
+### User
+
+#### Registration
 ```
 POST /users/
 ```
@@ -77,8 +126,8 @@ Request
 ```
 Request Body:
 {
-  "username": "user",
-  "email": "user@gmail.com",
+  "username": " ",
+  "email": " ",
   "password": " "
 }
 ```
@@ -86,18 +135,16 @@ Response
 ```
 Response:
 {
-  "message": "User created successfully",
-  "data": {
-    "id": "uuid",
-    "username": "user",
-    "email": "user@gmail.com"
-  }
+    "status": "success",
+    "message": "User created successfully",
+    "data": {
+        "username": " ",
+        "email": " "
+    }
 }
 ```
-
-### Get User by ID
 ---
-Endpoint
+### Get User by ID
 ```
 GET /users/:id
 ```
@@ -107,7 +154,7 @@ Response:
 {
   "message": "success",
   "data": {
-    "id": "uuid",
+    "id": " ",
     "username": "user",
     "email": "user@gmail.com"
   }
@@ -118,8 +165,7 @@ Response:
 # IMPORTANT NOTES
 
 - Password disimpan dalam bentuk hash (bcrypt)
-- Login menghasilkan JWT token
-- Register tidak membutuhkan token (public route)
+- Login menghasilkan access token dan refresh token
 - Pastikan CORS aktif untuk frontend React
 - Gunakan Content-Type: application/json
 
