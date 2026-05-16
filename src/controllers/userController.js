@@ -16,7 +16,7 @@ const createUser = async (req, res) => {
                     password: hashedPassword
                 }
             ])
-            .select()
+            .select('id, username, email')
 
         if (error) {
             return res.status(400).json({
@@ -25,11 +25,17 @@ const createUser = async (req, res) => {
         }
 
         res.status(201).json({
+            status: 'success',
             message: 'User created successfully',
-            data
+            data: {
+                username: data[0].username,
+                email: data[0].email
+            }
         })
 
     } catch (error) {
+        console.error(error)
+
         res.status(500).json({
             message: error.message
         })
@@ -46,7 +52,7 @@ const getUserById = async (req, res) => {
             .eq('id', id)
             .single()
 
-        if (error) {
+        if (error || !data) {
             return res.status(404).json({
                 message: 'User not found'
             })
@@ -58,6 +64,8 @@ const getUserById = async (req, res) => {
         })
 
     } catch (error) {
+        console.error(error)
+
         res.status(500).json({
             message: error.message
         })

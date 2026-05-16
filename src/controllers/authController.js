@@ -1,20 +1,22 @@
 const dbConfig = require('../config/dbConfig')
 const bcrypt = require('bcrypt')
-const generateToken = require('../utils/tokenGenerator')
+
+const { generateAccessToken, generateRefreshToken, verifyRefreshToken } = require('../utils/tokenGenerator')
 
 const login = async (req, res) => {
     try {
         const { email, password } = req.body
 
-        const { data: user } = await dbConfig
+        const { data: user, error } = await dbConfig
             .from('users')
             .select('*')
             .eq('email', email)
             .single()
 
-        if (!user) {
-            return res.status(404).json({
-                message: 'User not found'
+        if (error || !user) {
+            return res.status(401).json({
+                status: 'failed',
+                message: 'Invalid credentials'
             })
         }
 
@@ -22,18 +24,76 @@ const login = async (req, res) => {
 
         if (!match) {
             return res.status(401).json({
-                message: 'Wrong password'
+                status: 'failed',
+                message: 'Invalid credentials'
             })
         }
 
-        const token = generateToken({
-            id: user.id,
-            email: user.email
+        const payload = {
+            email: user.email,
+            username: user.username
+        }
+
+        const accessToken = generateAccessToken(payload)
+        const refreshToken = generateRefreshToken(payload)
+
+
+        await dbConfig
+            .from('authentications')
+            .insert([{ token: refreshToken }])
+
+        res.status(200).json({
+            status: 'success',
+            data: {
+                accessToken,
+                refreshToken,
+                user: {
+                    username: user.username
+                }
+            }
+        })
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        })
+    }
+}
+
+const refresh = async (req, res) => {
+    try {
+        const { refreshToken } = req.body
+
+        const payload = verifyRefreshToken(refreshToken)
+
+        const accessToken = generateAccessToken({
+            id: payload.id
         })
 
-        res.json({
-            message: 'success',
-            token
+        res.status(200).json({
+            status: 'success',
+            data: {
+                accessToken
+            }
+        })
+
+    } catch (error) {
+        res.status(401).json({
+            message: 'Invalid refresh token'
+        })
+    }
+}
+
+const logout = async (req, res) => {
+    try {
+        const { refreshToken } = req.body
+
+        await dbConfig
+            .from('authentications')
+            .delete()
+            .eq('token', refreshToken)
+
+        res.status(200).json({
+            status: 'success'
         })
 
     } catch (error) {
@@ -43,4 +103,4 @@ const login = async (req, res) => {
     }
 }
 
-module.exports = {login}
+module.exports = { login, refresh, logout }

@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken')
 const authMiddleware = (req, res, next) => {
     const authHeader = req.headers.authorization
 
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    if (!authHeader) {
         return res.status(401).json({
             message: 'Token required'
         })
@@ -14,7 +14,7 @@ const authMiddleware = (req, res, next) => {
     try {
         const decoded = jwt.verify(
             token,
-            process.env.JWT_SECRET
+            process.env.ACCESS_TOKEN_KEY
         )
 
         req.user = decoded
@@ -22,7 +22,8 @@ const authMiddleware = (req, res, next) => {
 
     } catch (error) {
         return res.status(401).json({
-            message: 'Invalid token'
+            message: 'Invalid token',
+            error: error.message
         })
     }
 }
