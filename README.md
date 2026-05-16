@@ -43,12 +43,12 @@ npm run dev
 ```
 ---
 
-# Enpoint
-### Login
+## Enpoint
+### Authentications
 ---
 Endpoint
 ```
-POST /auth/login
+POST /authentications
 ```
 Request
 ```

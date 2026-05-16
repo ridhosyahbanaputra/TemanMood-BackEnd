@@ -11,7 +11,7 @@ app.use(cors());
 
 app.use(express.json())
 
-app.get('/', async (req, res) => {
+app.get('/healty', async (req, res) => {
     try {
         const { error } = await dbConfig
             .from('users')
@@ -40,7 +40,7 @@ app.get('/', async (req, res) => {
     }
 })
 
-app.use('/auth', authRoute)
+app.use(authRoute)
 app.use('/users', userRoute)
 
 module.exports = app
