@@ -5,8 +5,10 @@ const dbConfig = require('./config/dbConfig')
 
 const authRoute = require('./routes/authRoute')
 const userRoute = require('./routes/userRoute')
+const storyRoute = require('./routes/storyRoute')
 
 const app = express()
+
 app.use(cors());
 
 app.use(express.json())
@@ -41,6 +43,9 @@ app.get('/healty', async (req, res) => {
 })
 
 app.use(authRoute)
+
 app.use('/users', userRoute)
+
+app.use('/story',storyRoute)
 
 module.exports = app

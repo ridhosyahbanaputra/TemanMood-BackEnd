@@ -13,6 +13,7 @@ Backend API untuk aplikasi TemanMood menggunakan Node.js, Express, dan Supabase.
 - Joi 
 - dotenv 
 - cors 
+- nanoid
 - nodemon
 
 ---
@@ -52,17 +53,15 @@ Endpoint
 ```
 POST /authentications
 ```
-Request
-```
 Request Body:
+```
 {
   "email": "user@gmail.com",
   "password": "123456"
 }
 ```
-Response
-```
 Response:
+```
 {
   "message": "success",
   "data": {
@@ -79,16 +78,14 @@ Response:
 ```
 PUT /authentications
 ```
-Request
-```
 Request Body:
+```
 {
   "refreshToken": " "
 }
 ```
-Response
-```
 Response:
+```
 {
     "status": "success",
     "data": {
@@ -101,16 +98,14 @@ Response:
 ```
 DELETE /authentications
 ```
-Request
-```
 Request Body:
+```
 {
   "refreshToken": " "
 }
 ```
-Response
-```
 Response:
+```
 {
     "status": "success",
 }
@@ -120,20 +115,18 @@ Response:
 
 #### Registration
 ```
-POST /users/
-```
-Request
+POST /users
 ```
 Request Body:
+```
 {
   "username": " ",
   "email": " ",
   "password": " "
 }
 ```
-Response
-```
 Response:
+```
 {
     "status": "success",
     "message": "User created successfully",
@@ -148,9 +141,8 @@ Response:
 ```
 GET /users/:id
 ```
-Response
-```
 Response:
+```
 {
   "message": "success",
   "data": {
@@ -161,7 +153,111 @@ Response:
 }
 ```
 ---
+### Story
 
+#### Create Story
+```
+POST /story
+```
+Request Body:
+```
+{
+  "title": " ",
+  "content": " ",
+  "mood": " ",
+  "is_anonymous": true or false
+}
+```
+Response
+```
+{
+    "message": "Story created successfully",
+    "data": [
+        {
+            "id": ,
+            "user_id": " ",
+            "title": " ",
+            "content": " ",
+            "mood": " ",
+            "is_anonymous": true or false,
+            "created_at": " "
+        }
+    ]
+}
+```
+---
+#### Get All Story
+```
+GET /story
+```
+Response: 
+```
+{
+    "data": [
+        {
+            "id": 1,
+            "user_id": " ",
+            "title": " ",
+            "content": " ",
+            "mood": " ",
+            "is_anonymous": false,
+            "created_at": " ",
+            "users": {
+                "username": " "
+            }
+        }
+    ]
+},
+{
+    "data": [
+        {
+            "id": 2,
+            "user_id": " ",
+            "title": " ",
+            "content": " ",
+            "mood": " ",
+            "is_anonymous": false,
+            "created_at": " ",
+            "users": {
+                "username": " "
+            }
+        }
+    ]
+}
+```
+---
+### Get Story by ID
+```
+GET /story/:id
+```
+Response:
+```
+{
+    "data": [
+        {
+            "id": ,
+            "user_id": " ",
+            "title": " ",
+            "content": " ",
+            "mood": " ",
+            "is_anonymous": true or false,
+            "created_at": " "
+        }
+    ]
+}
+```
+---
+### Delet Story
+```
+DELETE /story/:id
+```
+Response:
+```
+{
+    "message": "Story deleted successfully"
+}
+```
+---
 # IMPORTANT NOTES
 
 - Password disimpan dalam bentuk hash (bcrypt)
