@@ -1,4 +1,4 @@
-# TemanMood Backend API
+# Teman Mood — Backend API Documentation
 
 Backend API untuk aplikasi TemanMood menggunakan Node.js, Express, dan Supabase.
 
@@ -55,7 +55,7 @@ Request
 Request Body:
 {
   "email": "user@gmail.com",
-  "password": "123456"
+  "password": " "
 }
 ```
 Response
