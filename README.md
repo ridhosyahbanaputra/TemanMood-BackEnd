@@ -144,12 +144,13 @@ GET /users/:id
 Response:
 ```
 {
-  "message": "success",
-  "data": {
-    "id": " ",
-    "username": "user",
-    "email": "user@gmail.com"
-  }
+    "status": "success",
+    "data": {
+        "id": " ",
+        "username": " ",
+        "email": " ",
+        "created_at": " ""
+    }
 }
 ```
 ---
@@ -247,7 +248,7 @@ Response:
 }
 ```
 ---
-### Delet Story
+### Delete Story
 ```
 DELETE /story/:id
 ```
