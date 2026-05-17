@@ -47,28 +47,28 @@ npm run dev
 ---
 
 # Enpoint
-### Login
+### Authentications
 ---
-Endpoint
+#### Login
 ```
 POST /authentications
 ```
 Request Body:
 ```
 {
-  "email": "user@gmail.com",
-  "password": "123456"
+  "email": " ",
+  "password": " "
 }
 ```
 Response:
 ```
 {
-  "message": "success",
-  "data": {
-      "accessToken": " ",
-      "refreshToken": " ",
-      "user": {
-          "username": " "
+    "status": "success",
+    "data": {
+        "accessToken": " ",
+        "user": {
+            "id": " ",
+            "username": " "
         }
     }
 }
@@ -112,7 +112,7 @@ Response:
 ```
 ---
 ### User
-
+----
 #### Registration
 ```
 POST /users
