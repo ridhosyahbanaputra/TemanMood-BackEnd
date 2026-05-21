@@ -1,9 +1,13 @@
-const { createClient } = require('@supabase/supabase-js')
-require('dotenv').config()
+import "dotenv/config";
+import { PrismaClient } from "@prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
 
-const dbConfig = createClient(
-    process.env.SUPABASE_URL,
-    process.env.SUPABASE_KEY
-)
+const adapter = new PrismaPg({
+    connectionString: process.env.DATABASE_URL,
+});
 
-module.exports = dbConfig
+const dbConfig = new PrismaClient({
+    adapter,
+});
+
+export default dbConfig;

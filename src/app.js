@@ -1,51 +1,45 @@
-const express = require('express')
-const cors = require("cors");
+import express from "express";
+import cors from "cors";
 
-const dbConfig = require('./config/dbConfig')
+import dbConfig from "./config/dbConfig.js";
 
-const authRoute = require('./routes/authRoute')
-const userRoute = require('./routes/userRoute')
-const storyRoute = require('./routes/storyRoute')
+import errorMiddleware from "./middlewares/errorMiddleware.js";
 
-const app = express()
+import authRoute from "./routes/authRoute.js";
+import userRoute from "./routes/userRoute.js";
+import storyRoute from "./routes/storyRoute.js";
+
+const app = express();
 
 app.use(cors());
+app.use(express.json());
 
-app.use(express.json())
-
-app.get('/healty', async (req, res) => {
+app.get("/health", async (req, res) => {
     try {
-        const { error } = await dbConfig
-            .from('users')
-            .select('id')
-            .limit(1)
-
-        if (error) {
-            return res.status(500).json({
-                status: 'failed',
-                database: 'disconnected',
-                error: error.message
-            })
-        }
+        await dbConfig.user.findFirst({
+            select: {
+                id: true,
+            },
+        });
 
         res.status(200).json({
-            status: 'success',
-            message: 'TemanMood API is running',
-            database: 'connected'
-        })
-
-    } catch (err) {
+            status: "success",
+            message: "TemanMood API is running",
+            database: "connected",
+        });
+    } catch (error) {
         res.status(500).json({
-            status: 'failed',
-            error: err.message
-        })
+            status: "failed",
+            database: "disconnected",
+            error: error.message,
+        });
     }
-})
+});
 
-app.use(authRoute)
+app.use(authRoute);
+app.use("/users", userRoute);
+app.use("/story", storyRoute);
 
-app.use('/users', userRoute)
+app.use(errorMiddleware)
 
-app.use('/story',storyRoute)
-
-module.exports = app
+export default app;

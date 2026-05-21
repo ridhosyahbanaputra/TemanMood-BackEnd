@@ -1,12 +1,15 @@
-const express = require("express");
+import express from "express";
+import authMiddleware from "../middlewares/authMiddleware.js";
+import validate from "../middlewares/validateMiddleware.js";
+import storySchema from "../validators/storyValidator.js";
+import {
+    createStory,
+    getStories,
+    getStoryById,
+    deleteStory,
+} from "../controllers/storyController.js";
+
 const router = express.Router();
-
-const authMiddleware = require("../middlewares/authMiddleware");
-const validate = require("../middlewares/validateMiddleware");
-
-const { storySchema } = require("../validators/storyValidator");
-
-const { createStory, getStories, getStoryById, deleteStory } = require("../controllers/storyController");
 
 router.post("/", authMiddleware, validate(storySchema), createStory);
 
@@ -16,4 +19,4 @@ router.get("/:id", getStoryById);
 
 router.delete("/:id", authMiddleware, deleteStory);
 
-module.exports = router;
+export default router;
