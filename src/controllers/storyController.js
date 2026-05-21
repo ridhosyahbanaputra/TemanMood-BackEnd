@@ -1,69 +1,75 @@
-const dbConfig = require("../config/dbConfig");
-const generateId = require("../utils/idGenerator");
+import dbConfig from "../config/dbConfig.js";
+import generateId from "../utils/idGenerator.js";
 
 const createStory = async (req, res) => {
     try {
         const { title, content, mood, is_anonymous } = req.body;
 
-        const { data: user, error: userError } = await dbConfig
-            .from("users")
-            .select("id")
-            .eq("email", req.user.email)
-            .single();
+        const user = await dbConfig.user.findUnique({
+            where: {
+                email: req.user.email,
+            },
+            select: {
+                id: true,
+            },
+        });
 
-        if (userError || !user) {
+        if (!user) {
             return res.status(404).json({
-                message: "User not found"
+                message: "User not found",
             });
         }
 
-        const { data, error } = await dbConfig
-            .from("stories")
-            .insert([
-                {
-                    id: generateId(),
-                    user_id: user.id,
-                    title,
-                    content,
-                    mood,
-                    is_anonymous
-                }
-            ])
-            .select();
-
-        if (error) throw error;
+        const story = await dbConfig.story.create({
+            data: {
+                id: generateId(),
+                userId: user.id,
+                title,
+                content,
+                mood,
+                isAnonymous: is_anonymous ?? false,
+            },
+            include: {
+                user: {
+                    select: {
+                        username: true,
+                    },
+                },
+            },
+        });
 
         res.status(201).json({
             message: "Story created successfully",
-            data
+            data: story,
         });
-
     } catch (error) {
         res.status(500).json({
-            message: error.message
+            message: error.message,
         });
     }
 };
 
 const getStories = async (req, res) => {
     try {
-        const { data, error } = await dbConfig
-            .from("stories")
-            .select(`
-        *,
-        users(username)
-      `)
-            .order("created_at", { ascending: false });
-
-        if (error) throw error;
-
-        res.status(200).json({
-            data
+        const stories = await dbConfig.story.findMany({
+            include: {
+                user: {
+                    select: {
+                        username: true,
+                    },
+                },
+            },
+            orderBy: {
+                createdAt: "desc",
+            },
         });
 
+        res.status(200).json({
+            data: stories,
+        });
     } catch (error) {
         res.status(500).json({
-            message: error.message
+            message: error.message,
         });
     }
 };
@@ -72,24 +78,31 @@ const getStoryById = async (req, res) => {
     try {
         const { id } = req.params;
 
-        const { data, error } = await dbConfig
-            .from("stories")
-            .select(`
-        *,
-        users(username)
-      `)
-            .eq("id", id)
-            .single();
-
-        if (error) throw error;
-
-        res.status(200).json({
-            data
+        const story = await dbConfig.story.findUnique({
+            where: {
+                id: Number(id),
+            },
+            include: {
+                user: {
+                    select: {
+                        username: true,
+                    },
+                },
+            },
         });
 
+        if (!story) {
+            return res.status(404).json({
+                message: "Story not found",
+            });
+        }
+
+        res.status(200).json({
+            data: story,
+        });
     } catch (error) {
-        res.status(404).json({
-            message: "Stories not found"
+        res.status(500).json({
+            message: error.message,
         });
     }
 };
@@ -98,35 +111,53 @@ const deleteStory = async (req, res) => {
     try {
         const { id } = req.params;
 
-        const { data: user, error: userError } = await dbConfig
-            .from("users")
-            .select("id")
-            .eq("email", req.user.email)
-            .single();
+        const user = await dbConfig.user.findUnique({
+            where: {
+                email: req.user.email,
+            },
+            select: {
+                id: true,
+            },
+        });
 
-        if (userError || !user) {
+        if (!user) {
             return res.status(404).json({
-                message: "User not found"
+                message: "User not found",
             });
         }
 
-        const { error } = await dbConfig
-            .from("stories")
-            .delete()
-            .eq("id", id)
-            .eq("user_id", user.id);
-
-        if (error) throw error;
-
-        res.status(200).json({
-            message: "Story deleted successfully"
+        const story = await dbConfig.story.findFirst({
+            where: {
+                id: Number(id),
+                userId: user.id,
+            },
         });
 
+        if (!story) {
+            return res.status(404).json({
+                message: "Story not found or you are not authorized",
+            });
+        }
+
+        await dbConfig.story.delete({
+            where: {
+                id: Number(id),
+            },
+        });
+
+        res.status(200).json({
+            message: "Story deleted successfully",
+        });
     } catch (error) {
         res.status(500).json({
-            message: error.message
+            message: error.message,
         });
     }
 };
 
-module.exports = { createStory, getStories, getStoryById, deleteStory };
+export {
+    createStory,
+    getStories,
+    getStoryById,
+    deleteStory,
+};

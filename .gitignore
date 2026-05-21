@@ -34,3 +34,4 @@ Thumbs.db
 
 # Optional: local debug files
 *.local
+/src/generated/prisma

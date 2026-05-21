@@ -1,31 +1,33 @@
-const jwt = require('jsonwebtoken')
+import jwt from "jsonwebtoken";
 
 const authMiddleware = (req, res, next) => {
-    const authHeader = req.headers.authorization
+    const authHeader = req.headers.authorization;
 
     if (!authHeader) {
         return res.status(401).json({
-            message: 'Token required'
-        })
+            message: "Token required",
+        });
     }
 
-    const token = authHeader.split(' ')[1]
+    const token = authHeader.split(" ")[1];
+
+    if (!token) {
+        return res.status(401).json({
+            message: "Invalid token format",
+        });
+    }
 
     try {
-        const decoded = jwt.verify(
-            token,
-            process.env.ACCESS_TOKEN_KEY
-        )
+        const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_KEY);
 
-        req.user = decoded
-        next()
-
+        req.user = decoded;
+        next();
     } catch (error) {
         return res.status(401).json({
-            message: 'Invalid token',
-            error: error.message
-        })
+            message: "Invalid token",
+            error: error.message,
+        });
     }
-}
+};
 
-module.exports = authMiddleware
+export default authMiddleware;
