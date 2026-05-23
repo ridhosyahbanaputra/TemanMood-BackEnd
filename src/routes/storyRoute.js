@@ -1,22 +1,29 @@
-import express from "express";
-import authMiddleware from "../middlewares/authMiddleware.js";
-import validate from "../middlewares/validateMiddleware.js";
-import storySchema from "../validators/storyValidator.js";
+import express from 'express';
+import authMiddleware from '../middlewares/authMiddleware.js';
+import validate from '../middlewares/validateMiddleware.js';
+import preventDuplicateStory from '../middlewares/preventDuplicateStoryMiddleware.js';
+import storySchema from '../validators/storyValidator.js';
 import {
-    createStory,
-    getStories,
-    getStoryById,
-    deleteStory,
-} from "../controllers/storyController.js";
+  createStory,
+  getStories,
+  getStoryById,
+  deleteStory,
+} from '../controllers/storyController.js';
 
 const router = express.Router();
 
-router.post("/", authMiddleware, validate(storySchema), createStory);
+router.post(
+  '/',
+  authMiddleware,
+  validate(storySchema),
+  preventDuplicateStory,
+  createStory
+);
 
-router.get("/", getStories);
+router.get('/', getStories);
 
-router.get("/:id", getStoryById);
+router.get('/:id', getStoryById);
 
-router.delete("/:id", authMiddleware, deleteStory);
+router.delete('/:id', authMiddleware, deleteStory);
 
 export default router;

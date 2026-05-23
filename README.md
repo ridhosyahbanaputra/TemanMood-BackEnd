@@ -17,14 +17,17 @@ Backend API untuk aplikasi TemanMood menggunakan Node.js, Express, Prisma ORM, d
 - cors
 - nanoid
 - nodemon
+
 ---
 
 ## Installation
+
 ```
 git clone <repo-url>
 cd TemanMood-Backend
 npm install
 ```
+
 ---
 
 ## Environment Setup
@@ -40,42 +43,60 @@ DIRECT_URL="your_supabase_direct_database_url"
 ACCESS_TOKEN_KEY=your_secret_key
 REFRESH_TOKEN_KEY=your_secret_key
 ```
+
 ---
+
 ## Prisma Setup
 
 ### Generate Prisma Client
+
 ```
 npx prisma generate
 ```
+
 ### Jalankan migration saat development
+
 ```
 npx prisma migrate dev
 ```
+
 ### Cek status migration
+
 ```
 npx prisma migrate status
 ```
+
 ### Buka Prisma Studio
+
 ```
 npx prisma studio
 ```
+
 ---
 
 # Enpoint
+
 ### Authentications
+
 ---
+
 #### Login
+
 ```
 POST /authentications
 ```
+
 Request Body:
+
 ```
 {
   "email": " ",
   "password": " "
 }
 ```
+
 Response:
+
 ```
 {
     "status": "success",
@@ -89,18 +110,25 @@ Response:
     }
 }
 ```
+
 ---
+
 #### Refresh Token
+
 ```
 PUT /authentications
 ```
+
 Request Body:
+
 ```
 {
   "refreshToken": " "
 }
 ```
+
 Response:
+
 ```
 {
     "status": "success",
@@ -109,31 +137,45 @@ Response:
     }
 }
 ```
+
 ---
+
 #### Logout
+
 ```
 DELETE /authentications
 ```
+
 Request Body:
+
 ```
 {
   "refreshToken": " "
 }
 ```
+
 Response:
+
 ```
 {
     "status": "success",
 }
 ```
+
 ---
+
 ### User
-----
+
+---
+
 #### Registration
+
 ```
 POST /users
 ```
+
 Request Body:
+
 ```
 {
   "username": " ",
@@ -141,7 +183,9 @@ Request Body:
   "password": " "
 }
 ```
+
 Response:
+
 ```
 {
     "status": "success",
@@ -153,12 +197,17 @@ Response:
     }
 }
 ```
+
 ---
+
 ### Get User by ID
+
 ```
 GET /users/:id
 ```
+
 Response:
+
 ```
 {
     "status": "success",
@@ -170,14 +219,19 @@ Response:
     }
 }
 ```
+
 ---
+
 ### Story
 
 #### Create Story
+
 ```
 POST /story
 ```
+
 Request Body:
+
 ```
 {
   "title": " ",
@@ -186,7 +240,9 @@ Request Body:
   "is_anonymous": true or false
 }
 ```
+
 Response
+
 ```
 {
     "message": "Story created successfully",
@@ -206,12 +262,17 @@ Response
     ]
 }
 ```
+
 ---
+
 #### Get All Story
+
 ```
 GET /story
 ```
-Response: 
+
+Response:
+
 ```
 {
     "data": [
@@ -246,12 +307,17 @@ Response:
     ]
 }
 ```
+
 ---
+
 ### Get Story by ID
+
 ```
 GET /story/:id
 ```
+
 Response:
+
 ```
 {
     "data": [
@@ -270,30 +336,37 @@ Response:
     ]
 }
 ```
+
 ---
+
 ### Delete Story
+
 ```
 DELETE /story/:id
 ```
+
 Response:
+
 ```
 {
     "message": "Story deleted successfully"
 }
 ```
+
 ---
+
 # Important Notes
 
 - Password disimpan dalam bentuk hash menggunakan bcrypt.
-- Login menghasilkan ```accessToken``` dan ```refreshToken```.
-- Refresh token disimpan di tabel ```authentications```.
-- Story menggunakan ID angka dari ```nanoid```.
+- Login menghasilkan `accessToken` dan `refreshToken`.
+- Refresh token disimpan di tabel `authentications`.
+- Story menggunakan ID angka dari `nanoid`.
 - User ID menggunakan UUID.
-- Jika user dihapus, story tetap ada karena relasi menggunakan ```ON DELETE SET NULL```.
-- Gunakan header ```Authorization: Bearer <accessToken>``` untuk endpoint yang - membutuhkan login.
-- Gunakan ```Content-Type: application/json```.
+- Jika user dihapus, story tetap ada karena relasi menggunakan `ON DELETE SET NULL`.
+- Gunakan header `Authorization: Bearer <accessToken>` untuk endpoint yang - membutuhkan login.
+- Gunakan `Content-Type: application/json`.
 - RLS diaktifkan pada tabel aplikasi.
-- Tabel ```_prisma_migrations``` tidak perlu diaktifkan RLS karena itu tabel internal Prisma.
-- Prisma Client digunakan melalui ```@prisma/client```.
+- Tabel `_prisma_migrations` tidak perlu diaktifkan RLS karena itu tabel internal Prisma.
+- Prisma Client digunakan melalui `@prisma/client`.
 
 ---

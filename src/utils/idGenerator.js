@@ -1,6 +1,6 @@
-import { customAlphabet } from "nanoid";
+import { customAlphabet } from 'nanoid';
 
-const nanoid = customAlphabet("1234567890", 8);
+const nanoid = customAlphabet('1234567890', 8);
 
 const generateId = () => {
   return Number(nanoid());
