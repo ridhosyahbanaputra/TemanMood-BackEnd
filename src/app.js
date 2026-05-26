@@ -8,6 +8,7 @@ import errorMiddleware from './middlewares/errorMiddleware.js';
 import authRoute from './routes/authRoute.js';
 import userRoute from './routes/userRoute.js';
 import storyRoute from './routes/storyRoute.js';
+import storyBookmarkRoute from './routes/storyBookmarkRoute.js'
 
 const app = express();
 
@@ -39,6 +40,7 @@ app.get('/health', async (req, res) => {
 app.use(authRoute);
 app.use('/users', userRoute);
 app.use('/story', storyRoute);
+app.use('/story-bookmarks', storyBookmarkRoute)
 
 app.use(errorMiddleware);
 

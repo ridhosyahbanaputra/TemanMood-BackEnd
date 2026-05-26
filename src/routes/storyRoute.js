@@ -5,8 +5,9 @@ import preventDuplicateStory from '../middlewares/preventDuplicateStoryMiddlewar
 import storySchema from '../validators/storyValidator.js';
 import {
   createStory,
-  getStories,
+  getStory,
   getStoryById,
+  getStoryByUserId,
   deleteStory,
 } from '../controllers/storyController.js';
 
@@ -20,7 +21,9 @@ router.post(
   createStory
 );
 
-router.get('/', getStories);
+router.get('/', getStory);
+
+router.get('/user/:userId', authMiddleware, getStoryByUserId)
 
 router.get('/:id', getStoryById);
 

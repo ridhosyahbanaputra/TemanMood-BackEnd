@@ -39,6 +39,7 @@ const createStory = async (req, res) => {
     });
 
     res.status(201).json({
+      status: 'success',
       message: 'Story created successfully',
       data: {
         ...story,
@@ -52,7 +53,7 @@ const createStory = async (req, res) => {
   }
 };
 
-const getStories = async (req, res) => {
+const getStory = async (req, res) => {
   try {
     const stories = await dbConfig.story.findMany({
       include: {
@@ -73,10 +74,48 @@ const getStories = async (req, res) => {
     }));
 
     res.status(200).json({
+      status: 'success',
       data: mappedStories,
     });
   } catch (error) {
     res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
+const getStoryByUserId = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const stories = await dbConfig.story.findMany({
+      where: {
+        userId,
+      },
+      include: {
+        user: {
+          select: {
+            username: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    const mappedStories = stories.map((story) => ({
+      ...story,
+      user: story.isAnonymous ? null : story.user,
+    }));
+
+    res.status(200).json({
+      status: 'success',
+      data: mappedStories,
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'failed',
       message: error.message,
     });
   }
@@ -113,6 +152,7 @@ const getStoryById = async (req, res) => {
     }
 
     res.status(200).json({
+      status: 'success',
       data: {
         ...story,
         user: story.isAnonymous ? null : story.user,
@@ -171,6 +211,7 @@ const deleteStory = async (req, res) => {
     });
 
     res.status(200).json({
+      status: 'success',
       message: 'Story deleted successfully',
     });
   } catch (error) {
@@ -180,4 +221,4 @@ const deleteStory = async (req, res) => {
   }
 };
 
-export { createStory, getStories, getStoryById, deleteStory };
+export { createStory, getStory, getStoryByUserId, getStoryById, deleteStory };

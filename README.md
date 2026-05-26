@@ -86,6 +86,12 @@ npx prisma studio
 POST /authentications
 ```
 
+Headers:
+
+```
+Content-Type: application/json
+```
+
 Request Body:
 
 ```
@@ -119,6 +125,12 @@ Response:
 PUT /authentications
 ```
 
+Headers:
+
+```
+Content-Type: application/json
+```
+
 Request Body:
 
 ```
@@ -144,6 +156,13 @@ Response:
 
 ```
 DELETE /authentications
+```
+
+Headers:
+
+```
+Authorization: Bearer accessToken
+Content-Type: application/json
 ```
 
 Request Body:
@@ -174,6 +193,12 @@ Response:
 POST /users
 ```
 
+Headers:
+
+```
+Content-Type: application/json
+```
+
 Request Body:
 
 ```
@@ -200,10 +225,16 @@ Response:
 
 ---
 
-### Get User by ID
+### Get User by Id
 
 ```
 GET /users/:id
+```
+
+Headers:
+
+```
+Authorization: Bearer accessToken
 ```
 
 Response:
@@ -230,6 +261,13 @@ Response:
 POST /story
 ```
 
+Headers:
+
+```
+Authorization: Bearer accessToken
+Content-Type: application/json
+```
+
 Request Body:
 
 ```
@@ -245,6 +283,7 @@ Response
 
 ```
 {
+    "status": "success",
     "message": "Story created successfully",
     "data": [
         {
@@ -275,6 +314,7 @@ Response:
 
 ```
 {
+    "status": "success",
     "data": [
         {
             "id": 1,
@@ -287,11 +327,7 @@ Response:
             "users": {
                 "username": " "
             }
-        }
-    ]
-},
-{
-    "data": [
+        },
         {
             "id": 2,
             "user_id": " ",
@@ -305,12 +341,66 @@ Response:
             }
         }
     ]
+},
+```
+
+---
+
+### Get Story by User Id
+
+```
+GET /story/user/:userId
+```
+Headers:
+
+```
+Authorization: Bearer accessToken
+```
+Response:
+
+```
+{
+    "status": "success",
+    "data": [
+        {
+            "id": 1,
+            "userId": " ",
+            "title": " ",
+            "mood": " ",
+            "isAnonymous": true or false,
+            "createdAt": " ",
+            "user": {
+                "username": " "
+            }
+        },
+        {
+            "id": 2,
+            "userId": " ",
+            "title": " ",
+            "content": " ",
+            "mood": " ",
+            "isAnonymous": true or false,,
+            "createdAt": " ",
+            "user": null
+        },
+        {
+            "id": 3,
+            "userId": " ",
+            "title": " ",
+            "mood": " ",
+            "isAnonymous": true or false,
+            "createdAt": " ",
+            "user": {
+                "username": " "
+            }
+        },
+    ]
 }
 ```
 
 ---
 
-### Get Story by ID
+### Get Story by Id
 
 ```
 GET /story/:id
@@ -320,20 +410,17 @@ Response:
 
 ```
 {
-    "data": [
-        {
-            "id": ,
-            "user_id": " ",
-            "title": " ",
-            "content": " ",
-            "mood": " ",
-            "is_anonymous": true or false,
-            "created_at": " ",
-            "user": {
-                "username": " "
-            }
+    "status": "success",
+    "data": {
+        "id": 1,
+        "userId": " ",
+        "title": " ",
+        "isAnonymous": true or false,
+        "createdAt": " ",
+        "user": {
+            "username": " "
         }
-    ]
+    }
 }
 ```
 
@@ -345,14 +432,119 @@ Response:
 DELETE /story/:id
 ```
 
+Headers:
+
+```
+Authorization: Bearer accessToken
+```
+
 Response:
 
 ```
 {
+    "status": "success",
     "message": "Story deleted successfully"
 }
 ```
+---
 
+### Story Bookmark
+
+---
+
+#### Add Story Bookmark
+
+```
+POST /story-bookmarks/:storyId
+```
+
+Headers:
+
+```
+Authorization: Bearer accessToken
+```
+
+Response:
+
+```
+{
+    "status": "success",
+    "message": "Story bookmarked successfully",
+    "data": {
+        "id": 1,
+        "userId": " ",
+        "storyId": ,
+        "createdAt": " "
+    }
+}
+```
+---
+#### Get Story Bookmark
+
+```
+GET /story-bookmarks
+```
+
+Headers:
+
+```
+Authorization: Bearer accessToken
+```
+
+Response:
+
+```
+{
+    "status": "success",
+    "data": [
+        {
+            "id": 1,
+            "userId": " ",
+            "title": " ",
+            "mood": " ",
+            "isAnonymous": true or false,
+            "createdAt": " ",
+            "user": {
+                "username": " "
+            },
+            "bookmarkedAt": " "
+        },
+        {
+            "id": 2,
+            "userId": " ",
+            "title": " ",
+            "mood": " ",
+            "isAnonymous": true or false,
+            "createdAt": " ",
+            "user": {
+                "username": " "
+            },
+            "bookmarkedAt": " "
+        }
+    ]
+}
+```
+---
+#### Delete Story Bookmark By Story Id
+
+```
+DELETE /story-bookmarks/:storyId
+```
+
+Headers:
+
+```
+Authorization: Bearer accessToken
+```
+
+Response:
+
+```
+{
+    "status": "success",
+    "message": "Story bookmark removed successfully"
+}
+```
 ---
 
 # Important Notes
