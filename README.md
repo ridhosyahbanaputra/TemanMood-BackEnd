@@ -187,7 +187,7 @@ Response:
 
 ---
 
-#### Registration
+#### Create User
 
 ```
 POST /users
@@ -225,7 +225,7 @@ Response:
 
 ---
 
-### Get User by Id
+#### Get User by Id
 
 ```
 GET /users/:id
@@ -346,7 +346,7 @@ Response:
 
 ---
 
-### Get Story by User Id
+#### Get Story by User Id
 
 ```
 GET /story/user/:userId
@@ -400,7 +400,7 @@ Response:
 
 ---
 
-### Get Story by Id
+#### Get Story by Id
 
 ```
 GET /story/:id
@@ -426,7 +426,7 @@ Response:
 
 ---
 
-### Delete Story
+#### Delete Story
 
 ```
 DELETE /story/:id
@@ -536,13 +536,158 @@ Headers:
 ```
 Authorization: Bearer accessToken
 ```
-
 Response:
 
 ```
 {
     "status": "success",
     "message": "Story bookmark removed successfully"
+}
+```
+---
+### Notes
+
+---
+
+#### Create Notes
+
+```
+POST /notes
+```
+
+Headers:
+
+```
+Authorization: Bearer accessToken
+Content-Type: application/json
+```
+Request Body:
+```
+{
+  "title": " ",
+  "content": " ",
+  "color": " ",
+  "isPinned": true or false
+}
+```
+
+Response:
+
+```
+{
+    "status": "success",
+    "message": "Notes created successfully",
+    "data": {
+        "id": 1,
+        "userId": " ",
+        "title": " ",
+        "content": " ",
+        "color": " ",
+        "isPinned": true or false,
+        "createdAt": " ",
+        "updatedAt": " "
+    }
+}
+```
+---
+#### Get All Notes
+
+```
+GET /notes
+```
+
+Headers:
+
+```
+Authorization: Bearer accessToken
+```
+Response:
+
+```
+{
+    "status": "success"
+    "data": [
+        {
+            "id": 1,
+            "userId": " ",
+            "title": " ",
+            "content": " ",
+            "color": " ",
+            "isPinned": true or false,
+            "createdAt": " ",
+            "updatedAt": " "
+        },
+        {
+            "id": 2,
+            "userId": " ",
+            "title": " ",
+            "content": " ",
+            "color": " ",
+            "isPinned": true or false,
+            "createdAt": " ",
+            "updatedAt": " "
+        }
+    ]
+}
+```
+---
+#### Update Notes
+
+```
+PATCH /notes/:id
+```
+
+Headers:
+
+```
+Authorization: Bearer accessToken
+```
+Request Body:
+```
+{
+  "title": " ",
+  "content": " ",
+  "color": " ",
+  "isPinned": true or false
+}
+```
+
+Response:
+
+```
+{
+    "status": "success",
+    "message": "Notes updated successfully",
+    "data": {
+        "id": 1,
+        "userId": " ",
+        "title": " ",
+        "content": " ",
+        "color": " ",
+        "isPinned": true or false,
+        "createdAt": " ",
+        "updatedAt": " "
+    }
+}
+```
+---
+#### Delete Notes
+
+```
+DELETE /notes/:id
+```
+
+Headers:
+
+```
+Authorization: Bearer accessToken
+```
+Response:
+
+```
+{
+    "status": "success",
+    "message": "Notes deleted successfully"
 }
 ```
 ---

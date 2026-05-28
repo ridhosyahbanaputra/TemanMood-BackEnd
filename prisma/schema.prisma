@@ -20,6 +20,7 @@ model User {
 
   stories        Story[]
   storyBookmarks StoryBookmark[]
+  notes          Note[]
 
   @@map("users")
 }
@@ -56,4 +57,19 @@ model StoryBookmark {
 
   @@unique([userId, storyId])
   @@map("story_bookmarks")
+}
+
+model Note {
+  id        Int      @id @default(autoincrement())
+  userId    String   @map("user_id") @db.Uuid
+  title     String
+  content   String
+  color     String   @default("yellow")
+  isPinned  Boolean  @default(false) @map("is_pinned")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notes")
 }
