@@ -21,6 +21,7 @@ model User {
   stories        Story[]
   storyBookmarks StoryBookmark[]
   notes          Note[]
+  dailyCheckIns  DailyCheckIn[]
 
   @@map("users")
 }
@@ -72,4 +73,30 @@ model Note {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("notes")
+}
+
+model DailyCheckIn {
+  id              Int      @id @default(autoincrement())
+  userId          String   @map("user_id") @db.Uuid
+  checkInDate     DateTime @default(now()) @map("check_in_date") @db.Date
+  weekday         String
+  time            String
+  subMood         String   @map("sub_mood")
+  activities      Json
+  journal         String?
+  predictedMood   String   @map("predicted_mood")
+  rawMood         String   @map("raw_mood")
+  confidence      Float
+  probabilities   Json?
+  recommendations Json?
+  insight         Json?
+  moodScore       Float    @map("mood_score")
+  aiMetadata      Json?    @map("ai_metadata")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, checkInDate])
+  @@map("daily_checkins")
 }

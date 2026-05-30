@@ -10,6 +10,7 @@ import userRoute from './routes/userRoute.js';
 import storyRoute from './routes/storyRoute.js';
 import storyBookmarkRoute from './routes/storyBookmarkRoute.js';
 import notesRoute from './routes/notesRoute.js';
+import dailyCheckInRoute from './routes/dailyCheckInRoute.js';
 
 const app = express();
 
@@ -43,6 +44,7 @@ app.use('/users', userRoute);
 app.use('/story', storyRoute);
 app.use('/story-bookmarks', storyBookmarkRoute);
 app.use('/notes', notesRoute);
+app.use('/daily-check-ins', dailyCheckInRoute);
 
 app.use(errorMiddleware);
 
