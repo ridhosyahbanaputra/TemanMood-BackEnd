@@ -1,14 +1,18 @@
-import Joi from 'joi';
+import Joi from 'joi'
 
 const registerSchema = Joi.object({
-  username: Joi.string().min(3).required(),
-  email: Joi.string().email().required(),
-  password: Joi.string().min(8).required(),
-});
+  username: Joi.string().trim().min(3).max(50).required(),
+  email: Joi.string().trim().email().required(),
+  password: Joi.string().min(8).max(100).required(),
+}).unknown(false)
 
 const loginSchema = Joi.object({
-  email: Joi.string().email().required(),
+  email: Joi.string().trim().email().required(),
   password: Joi.string().required(),
-});
+}).unknown(false)
 
-export { registerSchema, loginSchema };
+const refreshTokenSchema = Joi.object({
+  refreshToken: Joi.string().required(),
+}).unknown(false)
+
+export { registerSchema, loginSchema, refreshTokenSchema }

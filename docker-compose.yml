@@ -1,0 +1,16 @@
+name: temanmood-backend-container
+
+services:
+  backend:
+    image: temanmood-backend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: temanmood-backend-container
+    ports:
+      - "9000:9000"
+    env_file:
+      - .env
+    environment:
+      - PORT=9000
+    restart: unless-stopped

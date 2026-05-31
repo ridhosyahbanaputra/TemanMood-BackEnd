@@ -1,4 +1,4 @@
-import Joi from 'joi';
+import Joi from 'joi'
 
 const createDailyCheckInSchema = Joi.object({
   weekday: Joi.string().trim().required(),
@@ -13,6 +13,9 @@ const createDailyCheckInSchema = Joi.object({
   activities: Joi.array().items(Joi.string().trim().min(1)).min(1).required(),
   journal: Joi.string().trim().allow('', null),
   use_insight: Joi.boolean().default(false),
-}).unknown(false);
+  timezone: Joi.string()
+    .valid('Asia/Jakarta', 'Asia/Makassar', 'Asia/Jayapura')
+    .default('Asia/Jakarta'),
+}).unknown(false)
 
-export { createDailyCheckInSchema };
+export { createDailyCheckInSchema }

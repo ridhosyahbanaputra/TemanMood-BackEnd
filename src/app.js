@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import helmet from 'helmet';
 
 import dbConfig from './config/dbConfig.js';
 
@@ -14,8 +15,19 @@ import dailyCheckInRoute from './routes/dailyCheckInRoute.js';
 
 const app = express();
 
-app.use(cors());
-app.use(express.json());
+const allowedOrigins = ['http://localhost:5173','http://localhost:4173', 'http://localhost:3000'];
+
+app.use(helmet());
+
+app.use(
+  cors({
+    origin: allowedOrigins,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  })
+);
+
+app.use(express.json({ limit: '1mb' }));
 
 app.get('/health', async (req, res) => {
   try {
@@ -40,11 +52,23 @@ app.get('/health', async (req, res) => {
 });
 
 app.use(authRoute);
+
 app.use('/users', userRoute);
+
 app.use('/story', storyRoute);
+
 app.use('/story-bookmarks', storyBookmarkRoute);
+
 app.use('/notes', notesRoute);
+
 app.use('/daily-check-ins', dailyCheckInRoute);
+
+app.use((req, res) => {
+  res.status(404).json({
+    status: 'failed',
+    message: `Route ${req.method} ${req.originalUrl} not found`,
+  });
+});
 
 app.use(errorMiddleware);
 

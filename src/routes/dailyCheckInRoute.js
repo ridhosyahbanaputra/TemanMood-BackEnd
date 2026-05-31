@@ -8,11 +8,13 @@ import {
   getTodayDailyCheckIn,
   getDailyCheckInById,
 } from '../controllers/dailyCheckInController.js';
+import { dailyCheckInLimiter } from '../middlewares/rateLimitMiddleware.js';
 
 const router = express.Router();
 
 router.post(
   '/',
+  dailyCheckInLimiter,
   authMiddleware,
   validate(createDailyCheckInSchema),
   createDailyCheckIn

@@ -6,12 +6,71 @@ import {
   getWordCount,
 } from '../utils/dailyCheckInUtils.js';
 
+const getInsightResponseStatus = (dailyCheckIn) => {
+  const insightRequested = dailyCheckIn.aiMetadata?.insightRequested || false;
+
+  if (insightRequested && dailyCheckIn.insight) {
+    return {
+      insightStatus: 'available',
+      insightMessage: null,
+    };
+  }
+
+  if (insightRequested && !dailyCheckIn.insight) {
+    return {
+      insightStatus: 'unavailable',
+      insightMessage: 'AI insight is currently unavailable',
+    };
+  }
+
+  return {
+    insightStatus: 'not_requested',
+    insightMessage: null,
+  };
+};
+
+const mapDailyCheckInResponse = (dailyCheckIn) => {
+  const { insightStatus, insightMessage } =
+    getInsightResponseStatus(dailyCheckIn);
+
+  return {
+    id: dailyCheckIn.id,
+    userId: dailyCheckIn.userId,
+    checkInDate: dailyCheckIn.checkInDate,
+    weekday: dailyCheckIn.weekday,
+    time: dailyCheckIn.time,
+    subMood: dailyCheckIn.subMood,
+    activities: dailyCheckIn.activities,
+    journal: dailyCheckIn.journal,
+    analysis: {
+      predictedMood: dailyCheckIn.predictedMood,
+      rawMood: dailyCheckIn.rawMood,
+      confidence: dailyCheckIn.confidence,
+      probabilities: dailyCheckIn.probabilities,
+      moodScore: dailyCheckIn.moodScore,
+    },
+    recommendations: dailyCheckIn.recommendations,
+    insight: dailyCheckIn.insight,
+    insightStatus,
+    insightMessage,
+    createdAt: dailyCheckIn.createdAt,
+    updatedAt: dailyCheckIn.updatedAt,
+  };
+};
+
 const createDailyCheckIn = async (req, res) => {
   try {
-    const { weekday, time, sub_mood, activities, journal, use_insight } =
-      req.body;
+    const {
+      weekday,
+      time,
+      sub_mood,
+      activities,
+      journal,
+      use_insight,
+      timezone,
+    } = req.body;
 
-    const checkInDate = getTodayDateOnly();
+    const checkInDate = getTodayDateOnly(timezone);
 
     const existingDailyCheckIn = await dbConfig.dailyCheckIn.findUnique({
       where: {
@@ -79,48 +138,15 @@ const createDailyCheckIn = async (req, res) => {
           topPredictions: aiData.analysis.topPredictions || null,
           insightRequested: shouldUseInsight,
           journalWordCount,
+          timezone,
         },
       },
     });
 
-    let insightStatus = 'not_requested';
-    let insightMessage = null;
-
-    if (shouldUseInsight && dailyCheckIn.insight) {
-      insightStatus = 'available';
-    }
-
-    if (shouldUseInsight && !dailyCheckIn.insight) {
-      insightStatus = 'unavailable';
-      insightMessage = 'AI insight is currently unavailable';
-    }
-
     res.status(201).json({
       status: 'success',
       message: 'Daily check-in created successfully',
-      data: {
-        id: dailyCheckIn.id,
-        userId: dailyCheckIn.userId,
-        checkInDate: dailyCheckIn.checkInDate,
-        weekday: dailyCheckIn.weekday,
-        time: dailyCheckIn.time,
-        subMood: dailyCheckIn.subMood,
-        activities: dailyCheckIn.activities,
-        journal: dailyCheckIn.journal,
-        analysis: {
-          predictedMood: dailyCheckIn.predictedMood,
-          rawMood: dailyCheckIn.rawMood,
-          confidence: dailyCheckIn.confidence,
-          probabilities: dailyCheckIn.probabilities,
-          moodScore: dailyCheckIn.moodScore,
-        },
-        recommendations: dailyCheckIn.recommendations,
-        insight: dailyCheckIn.insight,
-        insightStatus,
-        insightMessage,
-        createdAt: dailyCheckIn.createdAt,
-        updatedAt: dailyCheckIn.updatedAt,
-      },
+      data: mapDailyCheckInResponse(dailyCheckIn),
     });
   } catch (error) {
     res.status(error.statusCode || 500).json({
@@ -141,9 +167,13 @@ const getDailyCheckIns = async (req, res) => {
       },
     });
 
+    const mappedDailyCheckIns = dailyCheckIns.map((dailyCheckIn) =>
+      mapDailyCheckInResponse(dailyCheckIn)
+    );
+
     res.status(200).json({
       status: 'success',
-      data: dailyCheckIns,
+      data: mappedDailyCheckIns,
     });
   } catch (error) {
     res.status(500).json({
@@ -155,7 +185,9 @@ const getDailyCheckIns = async (req, res) => {
 
 const getTodayDailyCheckIn = async (req, res) => {
   try {
-    const checkInDate = getTodayDateOnly();
+    const { timezone } = req.query;
+
+    const checkInDate = getTodayDateOnly(timezone);
 
     const dailyCheckIn = await dbConfig.dailyCheckIn.findUnique({
       where: {
@@ -166,9 +198,16 @@ const getTodayDailyCheckIn = async (req, res) => {
       },
     });
 
+    if (!dailyCheckIn) {
+      return res.status(200).json({
+        status: 'success',
+        data: null,
+      });
+    }
+
     res.status(200).json({
       status: 'success',
-      data: dailyCheckIn,
+      data: mapDailyCheckInResponse(dailyCheckIn),
     });
   } catch (error) {
     res.status(500).json({
@@ -206,7 +245,7 @@ const getDailyCheckInById = async (req, res) => {
 
     res.status(200).json({
       status: 'success',
-      data: dailyCheckIn,
+      data: mapDailyCheckInResponse(dailyCheckIn),
     });
   } catch (error) {
     res.status(500).json({
