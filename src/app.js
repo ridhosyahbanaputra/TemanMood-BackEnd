@@ -1,6 +1,8 @@
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 import dbConfig from './config/dbConfig.js';
 
@@ -14,6 +16,9 @@ import notesRoute from './routes/notesRoute.js';
 import dailyCheckInRoute from './routes/dailyCheckInRoute.js';
 
 const app = express();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const allowedOrigins = [
   'http://localhost:5173',
@@ -33,6 +38,31 @@ app.use(
 );
 
 app.use(express.json({ limit: '1mb' }));
+
+app.get('/favicon.ico', (req, res) => {
+  res.redirect('/favicon.svg');
+});
+
+app.get('/favicon.svg', (req, res) => {
+  res.type('image/svg+xml');
+  res.sendFile(path.join(__dirname, '../public/favicon.svg'));
+});
+
+app.get('/', (req, res) => {
+  res.status(200).json({
+    status: 'success',
+    message: 'Welcome to TemanMood Backend API',
+    availableEndpoints: {
+      health: '/health',
+      authentications: '/authentications',
+      users: '/users',
+      stories: '/story',
+      storyBookmarks: '/story-bookmarks',
+      notes: '/notes',
+      dailyCheckIns: '/daily-check-ins',
+    },
+  });
+});
 
 app.get('/health', async (req, res) => {
   try {

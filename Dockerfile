@@ -17,6 +17,7 @@ RUN npm install
 RUN npx prisma generate
 
 COPY src ./src
+COPY public ./public
 
 EXPOSE 9000
 
