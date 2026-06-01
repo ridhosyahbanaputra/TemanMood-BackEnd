@@ -21,6 +21,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const allowedOrigins = [
+  'https://temanmood.netlify.app/',
   'http://localhost:5173',
   'http://localhost:4173',
   'http://localhost:3000',

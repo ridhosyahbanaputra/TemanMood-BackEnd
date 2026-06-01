@@ -351,11 +351,13 @@ Response:
 ```
 GET /story/user/:userId
 ```
+
 Headers:
 
 ```
 Authorization: Bearer accessToken
 ```
+
 Response:
 
 ```
@@ -446,6 +448,7 @@ Response:
     "message": "Story deleted successfully"
 }
 ```
+
 ---
 
 ### Story Bookmark
@@ -478,7 +481,9 @@ Response:
     }
 }
 ```
+
 ---
+
 #### Get Story Bookmark
 
 ```
@@ -524,7 +529,9 @@ Response:
     ]
 }
 ```
+
 ---
+
 #### Delete Story Bookmark By Story Id
 
 ```
@@ -536,6 +543,7 @@ Headers:
 ```
 Authorization: Bearer accessToken
 ```
+
 Response:
 
 ```
@@ -544,7 +552,9 @@ Response:
     "message": "Story bookmark removed successfully"
 }
 ```
+
 ---
+
 ### Notes
 
 ---
@@ -561,7 +571,9 @@ Headers:
 Authorization: Bearer accessToken
 Content-Type: application/json
 ```
+
 Request Body:
+
 ```
 {
   "title": " ",
@@ -589,7 +601,9 @@ Response:
     }
 }
 ```
+
 ---
+
 #### Get All Notes
 
 ```
@@ -601,6 +615,7 @@ Headers:
 ```
 Authorization: Bearer accessToken
 ```
+
 Response:
 
 ```
@@ -630,7 +645,9 @@ Response:
     ]
 }
 ```
+
 ---
+
 #### Update Notes
 
 ```
@@ -642,7 +659,9 @@ Headers:
 ```
 Authorization: Bearer accessToken
 ```
+
 Request Body:
+
 ```
 {
   "title": " ",
@@ -670,7 +689,9 @@ Response:
     }
 }
 ```
+
 ---
+
 #### Delete Notes
 
 ```
@@ -682,6 +703,7 @@ Headers:
 ```
 Authorization: Bearer accessToken
 ```
+
 Response:
 
 ```
@@ -690,7 +712,9 @@ Response:
     "message": "Notes deleted successfully"
 }
 ```
+
 ---
+
 ### Daily Check-Ins
 
 ---
@@ -723,7 +747,8 @@ Request Body:
     "lelah"
   ],
   "journal": "Hari ini rasanya berat banget dan aku merasa sangat lelah.",
-  "use_insight": true
+  "use_insight": true,
+  "timezone": "Asia/Jakarta"
 }
 ```
 
@@ -760,11 +785,11 @@ Response:
             "moodScore": 22.09
         },
         "recommendations": [
-            "youtube",
-            "streaming",
-            "good meal",
-            "walk",
-            "reddit"
+            "YouTube",
+            "Streaming",
+            "Makan Enak",
+            "Walk",
+            "Reddit"
         ],
         "insight": null,
         "insightStatus": "unavailable",
@@ -777,13 +802,22 @@ Response:
 
 Notes:
 
-* Endpoint ini digunakan untuk membuat daily check-in harian user.
-* Endpoint ini akan memanggil TemanMood-AI untuk mendapatkan prediksi mood, rekomendasi aktivitas, dan insight opsional.
-* User hanya bisa melakukan daily check-in satu kali dalam satu hari.
-* Jika user sudah check-in hari ini, endpoint akan mengembalikan response `409 Conflict`.
-* Field `journal` bersifat optional.
-* Field `use_insight` hanya akan dianggap aktif jika `journal` memiliki minimal 5 kata valid.
-* Jika insight tidak tersedia karena limit atau error dari AI insight service, daily check-in tetap berhasil dibuat dan field `insight` akan bernilai `null`.
+- Endpoint ini digunakan untuk membuat daily check-in harian user.
+- Endpoint ini akan memanggil TemanMood-AI untuk mendapatkan prediksi mood, rekomendasi aktivitas, dan insight opsional.
+- User hanya bisa melakukan daily check-in satu kali dalam satu hari.
+- Jika user sudah check-in hari ini, endpoint akan mengembalikan response `409 Conflict`.
+- Field `journal` bersifat optional.
+- Field `use_insight` hanya akan dianggap aktif jika `journal` memiliki minimal 5 kata valid.
+- Field `timezone` digunakan untuk menentukan tanggal daily check-in berdasarkan zona waktu user.
+- Jika `timezone` tidak dikirim, backend akan menggunakan default `Asia/Jakarta`.
+- Timezone yang didukung:
+  - `Asia/Jakarta`
+  - `Asia/Makassar`
+  - `Asia/Jayapura`
+
+- Jika insight tidak tersedia karena limit atau error dari AI insight service, daily check-in tetap berhasil dibuat dan field `insight` akan bernilai `null`.
+- Field `analysis.moodScore` digunakan frontend untuk menampilkan bar level mood.
+- Field `aiMetadata` tetap disimpan di database, tetapi tidak dikirim ke frontend.
 
 ---
 
@@ -818,36 +852,24 @@ Response:
                 "deadline"
             ],
             "journal": "Hari ini rasanya berat banget.",
-            "predictedMood": "Bad",
-            "rawMood": "Negatif",
-            "confidence": 0.9519,
-            "probabilities": {
-                "Bad": 0.9519,
-                "Normal": 0.0318,
-                "Good": 0.0163
+            "analysis": {
+                "predictedMood": "Bad",
+                "rawMood": "Negatif",
+                "confidence": 0.9519,
+                "probabilities": {
+                    "Bad": 0.9519,
+                    "Normal": 0.0318,
+                    "Good": 0.0163
+                },
+                "moodScore": 22.09
             },
             "recommendations": [
-                "youtube",
-                "walk"
+                "YouTube",
+                "Walk"
             ],
             "insight": null,
-            "moodScore": 22.09,
-            "aiMetadata": {
-                "rawProbabilities": {
-                    "Negatif": 0.9519,
-                    "Netral": 0.0318,
-                    "Positif": 0.0163
-                },
-                "topPredictions": [
-                    {
-                        "mood": "Bad",
-                        "rawMood": "Negatif",
-                        "probability": 0.9519
-                    }
-                ],
-                "insightRequested": true,
-                "journalWordCount": 10
-            },
+            "insightStatus": "unavailable",
+            "insightMessage": "AI insight is currently unavailable",
             "createdAt": " ",
             "updatedAt": " "
         }
@@ -857,8 +879,11 @@ Response:
 
 Notes:
 
-* Endpoint ini mengambil semua daily check-in milik user yang sedang login.
-* Data diurutkan dari yang terbaru berdasarkan `createdAt`.
+- Endpoint ini mengambil semua daily check-in milik user yang sedang login.
+- Data diurutkan dari yang terbaru berdasarkan `createdAt`.
+- Response tidak mengirim `aiMetadata`.
+- Data hasil analisis mood berada di dalam object `analysis`.
+- Field `insightStatus` tetap dikirim agar frontend dapat menjaga tampilan insight setelah halaman di-refresh.
 
 ---
 
@@ -872,6 +897,18 @@ Headers:
 
 ```
 Authorization: Bearer accessToken
+```
+
+Query Params:
+
+```
+timezone=Asia/Jakarta
+```
+
+Contoh Request:
+
+```
+GET /daily-check-ins/today?timezone=Asia/Jakarta
 ```
 
 Response jika user sudah check-in hari ini:
@@ -892,20 +929,24 @@ Response jika user sudah check-in hari ini:
             "deadline"
         ],
         "journal": "Hari ini rasanya berat banget.",
-        "predictedMood": "Bad",
-        "rawMood": "Negatif",
-        "confidence": 0.9519,
-        "probabilities": {
-            "Bad": 0.9519,
-            "Normal": 0.0318,
-            "Good": 0.0163
+        "analysis": {
+            "predictedMood": "Bad",
+            "rawMood": "Negatif",
+            "confidence": 0.9519,
+            "probabilities": {
+                "Bad": 0.9519,
+                "Normal": 0.0318,
+                "Good": 0.0163
+            },
+            "moodScore": 22.09
         },
         "recommendations": [
-            "youtube",
-            "walk"
+            "YouTube",
+            "Walk"
         ],
         "insight": null,
-        "moodScore": 22.09,
+        "insightStatus": "not_requested",
+        "insightMessage": null,
         "createdAt": " ",
         "updatedAt": " "
     }
@@ -923,9 +964,11 @@ Response jika user belum check-in hari ini:
 
 Notes:
 
-* Endpoint ini digunakan frontend untuk mengecek apakah user sudah melakukan daily check-in hari ini.
-* Jika `data` bernilai `null`, berarti user belum check-in hari ini.
-* Jika `data` berisi object, berarti user sudah check-in hari ini.
+- Endpoint ini digunakan frontend untuk mengecek apakah user sudah melakukan daily check-in hari ini.
+- Jika `data` bernilai `null`, berarti user belum check-in hari ini.
+- Jika `data` berisi object, berarti user sudah check-in hari ini.
+- Query `timezone` digunakan agar pengecekan hari ini mengikuti zona waktu user.
+- Jika `timezone` tidak dikirim, backend akan menggunakan default `Asia/Jakarta`.
 
 ---
 
@@ -959,20 +1002,24 @@ Response:
             "deadline"
         ],
         "journal": "Hari ini rasanya berat banget.",
-        "predictedMood": "Bad",
-        "rawMood": "Negatif",
-        "confidence": 0.9519,
-        "probabilities": {
-            "Bad": 0.9519,
-            "Normal": 0.0318,
-            "Good": 0.0163
+        "analysis": {
+            "predictedMood": "Bad",
+            "rawMood": "Negatif",
+            "confidence": 0.9519,
+            "probabilities": {
+                "Bad": 0.9519,
+                "Normal": 0.0318,
+                "Good": 0.0163
+            },
+            "moodScore": 22.09
         },
         "recommendations": [
-            "youtube",
-            "walk"
+            "YouTube",
+            "Walk"
         ],
         "insight": null,
-        "moodScore": 22.09,
+        "insightStatus": "not_requested",
+        "insightMessage": null,
         "createdAt": " ",
         "updatedAt": " "
     }
@@ -981,10 +1028,118 @@ Response:
 
 Notes:
 
-* Endpoint ini mengambil detail daily check-in berdasarkan `id`.
-* User hanya bisa mengambil detail daily check-in miliknya sendiri.
+- Endpoint ini mengambil detail daily check-in berdasarkan `id`.
+- User hanya bisa mengambil detail daily check-in miliknya sendiri.
+- Response menggunakan struktur yang sama dengan `GET /daily-check-ins/today`.
+- Field `aiMetadata` tidak dikirim ke frontend.
 
 ---
+
+### Daily Check-In Insight Status
+
+Field `insightStatus` digunakan frontend untuk menentukan tampilan insight.
+
+Kemungkinan nilai:
+
+```
+available
+```
+
+Artinya insight tersedia dan field `insight` berisi object insight.
+
+```
+unavailable
+```
+
+Artinya insight diminta, tetapi AI insight sedang limit/error. Daily check-in tetap berhasil dibuat, tetapi `insight` bernilai `null`.
+
+```
+not_requested
+```
+
+Artinya insight tidak diminta. Biasanya karena `journal` kosong, kurang dari 5 kata valid, atau `use_insight` bernilai `false`.
+
+Contoh insight tersedia:
+
+```
+{
+    "insight": {
+        "summary": " ",
+        "suggestion": " ",
+        "encouragement": " "
+    },
+    "insightStatus": "available",
+    "insightMessage": null
+}
+```
+
+Contoh insight tidak tersedia karena limit/error:
+
+```
+{
+    "insight": null,
+    "insightStatus": "unavailable",
+    "insightMessage": "AI insight is currently unavailable"
+}
+```
+
+Contoh insight tidak diminta:
+
+```
+{
+    "insight": null,
+    "insightStatus": "not_requested",
+    "insightMessage": null
+}
+```
+
+---
+
+### Daily Check-In Mood Score
+
+Field `moodScore` berada di:
+
+```
+data.analysis.moodScore
+```
+
+Field ini digunakan frontend untuk menampilkan bar level mood.
+
+Range yang disarankan:
+
+```
+0 - 33    = Bad
+34 - 66   = Normal
+67 - 100  = Good
+```
+
+Contoh penggunaan frontend:
+
+```
+const moodScore = dailyCheckIn.analysis.moodScore;
+```
+
+---
+
+### Daily Check-In Important Notes
+
+- Daily check-in tidak memiliki endpoint delete.
+- Daily check-in merupakan data riwayat harian user.
+- Satu user hanya bisa melakukan satu daily check-in dalam satu hari.
+- Pengecekan satu check-in per hari menggunakan `checkInDate` berdasarkan timezone user.
+- Frontend disarankan mengirim timezone dari browser menggunakan:
+
+```
+Intl.DateTimeFormat().resolvedOptions().timeZone
+```
+
+- Prediksi mood utama berasal dari TemanMood-AI.
+- Insight bersifat opsional.
+- Jika insight terkena limit atau tidak tersedia, data daily check-in tetap berhasil disimpan.
+- Jika insight tidak tersedia, field `insight` bernilai `null`.
+- Field `insightStatus` muncul di semua response Daily Check-In agar insight tidak hilang setelah refresh halaman.
+- Field `moodScore` digunakan frontend untuk menampilkan bar level mood.
+- Field `aiMetadata` tetap disimpan di database, tetapi tidak dikirim ke frontend.
 
 ### Endpoint Summary
 
@@ -1023,7 +1178,6 @@ GET    /daily-check-ins/today        → Get today daily check-in
 GET    /daily-check-ins/:id          → Get daily check-in by ID
 ```
 
-
 # Important Notes
 
 - Password disimpan dalam bentuk hash menggunakan bcrypt.
@@ -1047,7 +1201,8 @@ GET    /daily-check-ins/:id          → Get daily check-in by ID
 - Field `insightStatus` hanya muncul pada response create untuk membantu frontend menampilkan status insight.
 - Field `moodScore` digunakan frontend untuk menampilkan bar level mood.
 - Range mood score yang disarankan:
-  * `0 - 33` = Bad
-  * `34 - 66` = Normal
-  * `67 - 100` = Good
+  - `0 - 33` = Bad
+  - `34 - 66` = Normal
+  - `67 - 100` = Good
+
 ---
